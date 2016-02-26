@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Cast App</title>
+        <style type="text/css">
+            div {
+                text-align:center;
+                top:0;
+                left:0;
+                height:100%;
+                width:100%;
+                color:#FF0077;
+                background-color:green;
+            }
+            <title>Chromecast</title>
+        </style>
+        <script type="text/javascript" src="//www.gstatic.com/cast/sdk/libs/receiver/2.0.0/cast_receiver.js"></script>
+        <!--<script type="text/javascript">
+            var app_id = "4E0C81CB";
+            var namespace = "urn:x-cast:com.google.cast.media";
+
+            function log(str) {
+                console.log(str);
+
+                var newSpan = document.createElement("span");
+                var newContent = document.createTextNode(str);
+                newSpan.appendChild(newContent);
+
+                var root = document.getElementById("root");
+                root.appendChild(newSpan);
+                root.appendChild(document.createElement("br"));
+            }
+
+            function onChannelOpened(event) {
+                log("onChannelOpened. Total number of channels: " + window.castReceiverManager.getSenders().length);
+                if(window.castReceiverManager.getSenders().length == 0) window.close();
+            }
+
+            function onError() {
+                log("onError");
+            }
+
+            function onMessage(event) {
+                console.log('Message [' + event.senderId + ']: ' + event.data);
+
+                displayText(event.data);
+                window.customMessageBus.send(event.senderId, event.data);
+                var message = event.data;
+                var senderId = event.senderId;
+                log("message from: " + senderId + " message: " + message);
+            }
+
+            function onLoad() {
+                log("document loaded");
+
+                window.castReceiverManager = cast.receiver.CastReceiverManager.getInstance();
+                console.log('Starting Receiver Manager');
+                window.castReceiverManager.onSenderConnected = onChannelOpened;
+                window.castReceiverManager.onSenderDisconnected = onChannelClosed;
+                window.customMessageBus = window.castReceiverManager.getCastMessageBus(namespace);
+                window.customMessageBus.onMessage = onMessage;
+                window.castReceiverManager.start();
+
+                log("cast started");
+
+                window.setInterval(onTimer, 2000);
+            }
+
+            function onTimer() {
+                broadcast("timer");
+            }
+
+            function broadcast(message) {
+                window.customMessageBus.broadcast(message);
+            }
+
+            function displayText(text) {
+                console.log(text);
+                document.getElementById("root").innerHTML=text;
+                window.castReceiverManager.setApplicationState(text);
+            }
+
+            window.addEventListener("load", onLoad);
+        </script>-->
+        <script type="text/javascript">
+            window.onload = function() {
+                var app_id = "4E0C81CB";
+                cast.receiver.logger.setLevelValue(0);
+                window.castReceiverManager = cast.receiver.CastReceiverManager.getInstance();
+                console.log('Starting Receiver Manager');
+
+                // handler for the 'ready' event
+                castReceiverManager.onReady = function(event) {
+                    console.log('Received Ready event: ' + JSON.stringify(event.data));
+                    window.castReceiverManager.setApplicationState("Application status is ready...");
+                };
+
+                // handler for 'senderconnected' event
+                castReceiverManager.onSenderConnected = function(event) {
+                    console.log('Received Sender Connected event: ' + event.data);
+                    console.log(window.castReceiverManager.getSender(event.data).userAgent);
+                };
+
+                // handler for 'senderdisconnected' event
+                castReceiverManager.onSenderDisconnected = function(event) {
+                    console.log('Received Sender Disconnected event: ' + event.data);
+                    if (window.castReceiverManager.getSenders().length == 0) {
+	                    window.close();
+	                }
+                };
+
+                // handler for 'systemvolumechanged' event
+                castReceiverManager.onSystemVolumeChanged = function(event) {
+                    console.log('Received System Volume Changed event: ' + event.data['level'] + ' ' + event.data['muted']);
+                };
+
+                // create a CastMessageBus to handle messages for a custom namespace
+                window.messageBus = window.castReceiverManager.getCastMessageBus('urn:x-cast:com.google.cast.sample.helloworld');
+
+                // handler for the CastMessageBus message event
+                window.messageBus.onMessage = function(event) {
+                    console.log('Message [' + event.senderId + ']: ' + event.data);
+                    // display the message from the sender
+                    displayText(event.data);
+                    // inform all senders on the CastMessageBus of the incoming message event
+                    // sender message listener will be invoked
+                    window.messageBus.send(event.senderId, event.data);
+                }
+
+                // initialize the CastReceiverManager with an application status message
+                window.castReceiverManager.start({statusText: "Application is starting"});
+                console.log('Receiver Manager started');
+            };
+
+            // utility function to display the text message in the input field
+            function displayText(text) {
+                console.log(text);
+                document.getElementById("root").innerHTML=text;
+                window.castReceiverManager.setApplicationState(text);
+            };
+        </script>
+    </head>
+    <body>
+        <div id="root">
+            Chromecast demo
+        </div>
+        <p style="color:#FF0077;">Hello, it's me</p>
+    </body>
+</html>
