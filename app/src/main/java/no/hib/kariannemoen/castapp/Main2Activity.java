@@ -25,7 +25,7 @@ import java.io.IOException;
 
 public class Main2Activity extends AppCompatActivity {
 
-    private static final String APP_ID = "4E0C81CB";
+    private static final String APP_ID = "9691CDC8";
     private static final String TAG = "ChromeCastActivity";
     private static final String NAMESPACE = "urn:x-cast:com.google.cast.media";
     private static final int REQUEST_GMS_ERROR = 0;
@@ -43,8 +43,8 @@ public class Main2Activity extends AppCompatActivity {
         public void onRouteUnselected(MediaRouter router, MediaRouter.RouteInfo route) {
             Log.d(TAG, "onRouteUnselected: " + route.getName());
             stopApplication();
-//            setSelectedDevice(null);
-//            setSessionStarted(false);
+            setSelectedDevice(null);
+            setSessionStarted(false);
         }
     };
     private final Cast.Listener castClientListener = new Cast.Listener() {
@@ -55,8 +55,8 @@ public class Main2Activity extends AppCompatActivity {
             } catch (IOException e) {
                 Log.w(TAG, "Exception while launching application", e);
             }
-//            setSelectedDevice(null);
-//            setSessionStarted(false);
+            setSelectedDevice(null);
+            setSessionStarted(false);
         }
 
         @Override
@@ -85,14 +85,14 @@ public class Main2Activity extends AppCompatActivity {
     private final GoogleApiClient.OnConnectionFailedListener connectionFailedListener = new GoogleApiClient.OnConnectionFailedListener() {
         @Override
         public void onConnectionFailed(ConnectionResult connectionResult) {
-//            setSelectedDevice(null);
+            setSelectedDevice(null);
         }
     };
     private final ResultCallback<Cast.ApplicationConnectionResult> connectionResultCallback = new ResultCallback<Cast.ApplicationConnectionResult>() {
         @Override
         public void onResult(Cast.ApplicationConnectionResult result) {
             Status status = result.getStatus();
-
+            Log.e(TAG, "" + status.getStatusCode());
             if(status.isSuccess()) {
                 applicationStarted = true;
 
@@ -173,7 +173,7 @@ public class Main2Activity extends AppCompatActivity {
 
     @Override
     protected void onStop() {
-//        setSelectedDevice(null);
+        setSelectedDevice(null);
         mediaRouter.removeCallback(mediaRouterCallback);
         super.onStop();
     }
